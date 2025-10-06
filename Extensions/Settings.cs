@@ -32,6 +32,10 @@ namespace SimpleBot.Extensions
                     new InventoryCurrency(CurrencyNames.Portal, 5, 11),
                 };
             }
+            if (NotIdentifyItems == null)
+            {
+                NotIdentifyItems = new ObservableCollection<NotIdentifyItem>();
+            }
         }
 
         #region Stashing
@@ -526,6 +530,7 @@ namespace SimpleBot.Extensions
         public bool AutoDnd { get; set; }
         public string DndMessage { get; set; }
         public ObservableCollection<InventoryCurrency> InventoryCurrencies { get; set; }
+        public ObservableCollection<NotIdentifyItem> NotIdentifyItems { get; set; }
 
         public class InventoryCurrency
         {
@@ -590,6 +595,27 @@ namespace SimpleBot.Extensions
                 Column = column;
                 Restock = restock;
             }
+        }
+        public class NotIdentifyItem
+        {
+            public string Name { get; set; }
+            public NotIdentifyItem()
+            {
+                Name = string.Empty;
+            }
+            public NotIdentifyItem(string name)
+            {
+                Name = name;
+            }
+        }
+        public bool IsNotIdentify(string itemName)
+        {
+            foreach (var entry in NotIdentifyItems)
+            {
+                if (entry.Name.Contains(itemName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
         }
 
         #endregion

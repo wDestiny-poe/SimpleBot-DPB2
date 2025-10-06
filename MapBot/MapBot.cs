@@ -281,7 +281,7 @@ namespace SimpleBot.MapBot
             //_taskManager.Add(new SpecialObjectTask());
             _taskManager.Add(new OpenChestTask());
             _taskManager.Add(new CombatTask(-1));
-            //_taskManager.Add(new IdTask());
+            _taskManager.Add(new IdTask());
             _taskManager.Add(new SellTask());
             _taskManager.Add(new StashTask());
             _taskManager.Add(new CurrencyRestockTask());

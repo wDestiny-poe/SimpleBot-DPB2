@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SimpleBot.Extensions.Positions;
 using DreamPoeBot.Loki.Bot;
 using DreamPoeBot.Common;
 using DreamPoeBot.Loki.Game;
 using DreamPoeBot.Loki.Game.GameData;
+using SimpleBot.Extensions.CachedObjects;
+using SimpleBot.Extensions.Positions;
+using SimpleBot.Extensions.CommonTasks;
 using Message = DreamPoeBot.Loki.Bot.Message;
+using StashItem = SimpleBot.Extensions.CommonTasks.StashTask.StashItem;
 
 namespace SimpleBot.Extensions.CommonTasks
 {
@@ -21,26 +24,45 @@ namespace SimpleBot.Extensions.CommonTasks
 
             var itemsToId = new List<Vector2i>();
             var itemFilter = ItemEvaluator.Instance;
+            var itemsToStash = new List<StashItem>();
 
             foreach (var item in Inventories.InventoryItems)
             {
                 if (item.IsIdentified || item.IsCorrupted || item.IsMirrored)
                     continue;
 
-                if (!itemFilter.Match(item, EvaluationType.Id))
+                // check if the item name is in NotIdentifyItems list
+                if (Settings.Instance.IsNotIdentify(item.Name))
+                {
+                    itemsToStash.Add(new StashItem(item));
                     continue;
+                }
+                //if (!itemFilter.Match(item, EvaluationType.Id))
+                //    continue;
 
                 itemsToId.Add(item.LocationTopLeft);
             }
-
+            if (itemsToStash.Count > 0)
+            {
+                if (!await StashTask.StashItems(itemsToStash))
+                {
+                    GlobalLog.Error("[IdTask] Fail to stash items from NotIdentify list.");
+                    ErrorManager.ReportError();
+                }
+                return true;
+            }
             if (itemsToId.Count == 0)
             {
                 GlobalLog.Info("[IdTask] No items to identify.");
                 return false;
             }
+            GlobalLog.Info($"[IdTask] Found {itemsToId.Count} items to identify.");
 
             // Add routine to identify with doriyani
-           
+
+            if (!await TownNpcs.IdentifyItems())
+                ErrorManager.ReportError();
+
             await Coroutines.CloseBlockingWindows();
             return true;
         }

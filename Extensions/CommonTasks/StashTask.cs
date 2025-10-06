@@ -54,6 +54,10 @@ namespace SimpleBot.Extensions.CommonTasks
                 GlobalLog.Info("[StashTask] No items to stash.");
                 return false;
             }
+            return await StashItems(itemsToStash);
+        }
+        public static async Task<bool> StashItems(List<StashItem> itemsToStash)
+        {
 
             if (_checkInvalidTabs)
             {
@@ -133,7 +137,7 @@ namespace SimpleBot.Extensions.CommonTasks
                     return true;
                 }
                 GlobalLog.Info($"[Events] Item stashed ({item.FullName})");
-                Utility.BroadcastMessage(this, Events.Messages.ItemStashedEvent, item);
+                Utility.BroadcastMessage(null, Events.Messages.ItemStashedEvent, item);
             }
             await Coroutines.CloseBlockingWindows();
             return true;
@@ -405,7 +409,7 @@ namespace SimpleBot.Extensions.CommonTasks
             RequestFullTabCheck();
         }
 
-        private class StashItem : CachedItem
+        public class StashItem : CachedItem
         {
             public Vector2i Position { get; }
             public string StashTab { get; set; }

@@ -121,6 +121,28 @@
                             </ItemsControl>
                         </StackPanel>
                     </Expander>
+                    <TextBlock Text="Do not identify" />
+                    <DataGrid x:Name="NotIdentifyGrid"
+                        AutoGenerateColumns="False"
+                        BorderThickness="1"
+                        GridLinesVisibility="All"
+                        ItemsSource="{Binding NotIdentifyItems}">
+
+                        <DataGrid.ContextMenu>
+                            <ContextMenu FontSize="12">
+                                <MenuItem Click="NotIdentifyAdd" Header="Add" />
+                                <MenuItem Click="NotIdentifyDelete" Header="Delete" />
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn MinWidth="100"
+                                Binding="{Binding Name}"
+                                Header="Name" />
+
+
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>

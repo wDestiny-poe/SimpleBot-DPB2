@@ -37,7 +37,7 @@ namespace SimpleBot.Extensions
             return false;
         }
 
-        public static async Task<bool> Interact(NetworkObject obj, Func<bool> success, string desc, int timeout = 3000)
+        public static async Task<bool> Interact(NetworkObject obj, Func<bool> success, string desc, int timeout = 3000, bool holdCtrl = false)
         {
             if (obj == null)
             {
@@ -51,8 +51,13 @@ namespace SimpleBot.Extensions
             await Coroutines.CloseBlockingWindows();
             await Coroutines.FinishCurrentAction();
             await Wait.LatencySleep();
+            //if (!LokiPoe.Input.HighlightObject(obj))
+            //{
+            //    GlobalLog.Error($"[Interact] Fail to highlight \"{name}\".");
+            //    return false;
+            //}
 
-            if (await Coroutines.InteractWith(obj))
+            if (await Coroutines.InteractWith(obj, holdCtrl))
             {
                 if (!await Wait.For(success, desc, 100, timeout))
                     return false;

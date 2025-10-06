@@ -88,6 +88,22 @@ namespace SimpleBot.Extensions
             GlobalLog.Error($"[GetSellVendor] Unsupported area for sell vendor \"{area.Name}\".");
             return null;
         }
+        public static TownNpc GetDoryani()
+        {
+            var area = World.CurrentArea;
+            if (area.IsHideoutArea)
+            {
+                var npc = LokiPoe.ObjectManager.Objects.Find(o => o is Npc && o.Metadata == "Metadata/NPC/Hideout/Doryani");
+                if (npc == null)
+                {
+                    GlobalLog.Error("[GetDoryani] Fail to find Doryani in hideout.");
+                    return null;
+                }
+                return new TownNpc(npc);
+            }
+            GlobalLog.Error($"[GetDoryani] Unsupported area for doryani \"{area.Name}\".");
+            return null;
+        }
 
         public static TownNpc GetCurrencyVendor()
         {
@@ -117,6 +133,16 @@ namespace SimpleBot.Extensions
             }
             GlobalLog.Error($"[GetCurrencyVendor] Unsupported area for currency vendor \"{area.Name}\".");
             return null;
+        }
+        public static async Task<bool> IdentifyItems()
+        {
+            LokiPoe.ProcessHookManager.ClearAllKeyStates();
+            var doryani = GetDoryani();
+            if (doryani == null)
+                return false;
+            if (!await doryani.Talk(true))
+                return false;
+            return true;
         }
         public static async Task<bool> SellItems(List<Vector2i> itemPositions)
         {
@@ -212,7 +238,7 @@ namespace SimpleBot.Extensions
             Position = obj.WalkablePosition();
         }
 
-        public async Task<bool> Talk()
+        public async Task<bool> Talk(bool holdCtrl = false)
         {
             await Position.ComeAtOnce();
 
@@ -222,7 +248,7 @@ namespace SimpleBot.Extensions
                 GlobalLog.Error($"[Talk] Fail to find NPC with name \"{Position.Name}\".");
                 return false;
             }
-            return await PlayerAction.Interact(npcObj, () => DialogUi.IsOpened || RewardUi.IsOpened, "dialog panel opening");
+            return await PlayerAction.Interact(npcObj, () => DialogUi.IsOpened || RewardUi.IsOpened, "dialog panel opening", 3000, holdCtrl);
         }
 
         public async Task<bool> OpenDialogPanel()
